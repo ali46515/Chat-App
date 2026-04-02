@@ -1,23 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Login.css";
 import assets from "/src/assets/assets.js";
 
 const Login = () => {
+    const [currState, setCurrState] = useState("Sign Up");
+
     return (
         <div className="login">
             <img src={assets.logo_big} alt="" className="logo" />
             <form className="login-form">
-                <h2>Welcome Back</h2>
-                <p className="form-subtitle">Please sign up to continue</p>
+                <h2>{currState}</h2>
+                <p className="form-subtitle">Please {currState==="Sign Up"? "sign up": "log in"} to continue</p>
 
-                <div className="input-group">
-                    <input
-                        type="text"
-                        placeholder="Username"
-                        className="form-input"
-                        required
-                    />
-                </div>
+                {currState === "Sign Up" && (
+                    <div className="input-group">
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            className="form-input"
+                            required
+                        />
+                    </div>
+                )}
 
                 <div className="input-group">
                     <input
@@ -37,17 +41,30 @@ const Login = () => {
                     />
                 </div>
 
-                <button type="submit" className="submit-btn">Create Account</button>
+                <button type="submit" className="submit-btn">
+                    {currState === "Sign Up" ? "Create Account" : "LogIn"}
+                </button>
 
                 <div className="login-term">
                     <input type="checkbox" id="terms" />
-                    <label htmlFor="terms">Agree to the <span className="link-text">terms of use</span> and <span className="link-text">privacy policy</span></label>
+                    <label htmlFor="terms">
+                        Agree to the <span className="link-text">terms of use</span> and{" "}
+                        <span className="link-text">privacy policy</span>
+                    </label>
                 </div>
 
                 <div className="login-forgot">
-                    <div className="login-toggle">
-                        Already have an account? <span className="toggle-link">Sign In</span>
-                    </div>
+                    {currState==="Sign Up" ? <p className="login-toggle">
+                        Already have an account?{" "}
+                        <span className="toggle-link" onClick={() => setCurrState("Login")}>
+                            Sign In
+                        </span>
+                    </p>: <p className="login-toggle">
+                        Create an account?{" "}
+                        <span className="toggle-link" onClick={() => setCurrState("Sign Up")}>
+                            Sign Up
+                        </span>
+                    </p>}
                 </div>
             </form>
         </div>
