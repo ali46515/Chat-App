@@ -23,11 +23,42 @@
 }
 
 .chat-user p {
-    flex: 1;
-    font-weight: 500;
-    color: #393939;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  flex: 1;
+  font-weight: 500;
+  color: #393939;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: white;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.chat-input img {
+  width: 30px;
+  cursor: pointer;
+}
+
+.chat-input label {
+  display: flex;
+}
+
+.chat-input label img {
+  width: 22px;
+}
+
+.chat-input input {
+  flex: 1;
+  border: none;
+  outline: none;
 }
