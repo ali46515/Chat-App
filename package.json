@@ -1,0 +1,14 @@
+{
+  "name": "chat-app",
+  "workspaces": [
+    "backend/*",
+    "frontend/*"
+  ],
+  "description": "A real-time chat application built with the MERN stack, enabling seamless messaging with dynamic user interactions.",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
