@@ -4,6 +4,9 @@
   position: relative;
   height: 75vh;
   overflow-y: scroll;
+  scrollbar-width: none;
+  scrollbar-color: #077eff #001030;
+  transition: all 0.3s ease;
 }
 
 .rs-profile {
@@ -11,37 +14,143 @@
   text-align: center;
   max-width: 70%;
   margin: auto;
+  animation: fadeIn 0.5s ease;
+}
+
+.profile-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-image-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #077eff, #00ff88, #077eff);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-image-wrapper:hover::before {
+  opacity: 0.6;
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .rs-profile img {
   width: 110px;
   aspect-ratio: 1/1;
   border-radius: 50%;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rs-profile img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(7, 126, 255, 0.3);
 }
 
 .rs-profile h3 {
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 500;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 5px;
-  margin: 5px 0px;
+  margin: 12px 0px 8px 0px;
+  background: linear-gradient(135deg, #fff, #077eff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.5px;
+}
+
+.rs-profile h3 img.dot {
+  width: 12px;
+  height: 12px;
+  animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
 }
 
 .rs-profile p {
-  font-size: 10px;
-  opacity: 80%;
-  font-weight: 300;
+  font-size: 11px;
+  opacity: 85%;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.3px;
+  background: rgba(7, 126, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
 }
+
+.rs-profile p:hover {
+  opacity: 100%;
+  background: rgba(7, 126, 255, 0.2);
+  transform: translateY(-2px);
+}
+
 .rs hr {
-  border-color: #ffffff50;
-  margin: 15px 0px;
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #ffffff50, #077eff, #ffffff50, transparent);
+  margin: 20px 15px;
+  width: calc(100% - 30px);
 }
 
 .rs-media {
   padding: 0px 20px;
   font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+.rs-media p {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.rs-media p::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: #077eff;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.rs-media:hover p::after {
+  width: 100%;
 }
 
 .rs-media div {
@@ -49,14 +158,25 @@
   overflow-y: scroll;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 5px;
-  margin-top: 8px;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 4px;
+  scrollbar-width: none;
 }
 
 .rs-media div img {
   width: 60px;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  aspect-ratio: 1/1;
+  object-fit: cover;
+}
+
+.rs-media div img:hover {
+  transform: scale(1.08) rotate(2deg);
+  box-shadow: 0 4px 12px rgba(7, 126, 255, 0.3);
+  border-radius: 12px;
 }
 
 .rs button {
@@ -64,12 +184,59 @@
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #077eff;
+  background: linear-gradient(135deg, #077eff, #0056b3);
   color: white;
   border: none;
   font-size: 12px;
-  font-weight: 300;
-  padding: 10px 6px;
-  border-radius: 20px;
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: 30px;
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(7, 126, 255, 0.3);
+  width: auto;
+  min-width: 100px;
+}
+
+.rs button:hover {
+  background: linear-gradient(135deg, #0056b3, #077eff);
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(7, 126, 255, 0.4);
+}
+
+.rs button:active {
+  transform: translateX(-50%) translateY(0px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .rs-profile {
+    max-width: 85%;
+    padding-top: 40px;
+  }
+  
+  .rs-profile img {
+    width: 80px;
+  }
+  
+  .rs-media div img {
+    width: 50px;
+  }
+  
+  .rs button {
+    padding: 8px 18px;
+    font-size: 11px;
+  }
 }

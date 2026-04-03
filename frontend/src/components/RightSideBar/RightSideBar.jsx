@@ -6,8 +6,13 @@ const RightSideBar = () => {
     return (
         <div className="rs">
             <div className="rs-profile">
-                <img src={assets.profile_img} alt="" />
-                <h3>Ahmad Ijaz <img src={assets.green_dot} alt="" className='dot' /></h3>
+                <div className="profile-image-wrapper">
+                    <img src={assets.profile_img} alt="" />
+                </div>
+                <h3>
+                    Ahmad Ijaz
+                    <img src={assets.green_dot} alt="" className='dot' />
+                </h3>
                 <p>Salam, Kesy ho?</p>
             </div>
             <hr />
