@@ -20,7 +20,7 @@ const ChatBox = () => {
                     </div>
                 </div>
                 <div className="r-msg">
-                    <p className="msg">Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui, sint minus. Esse iste, sunt suscipit temporibus delectus facilis ducimus qui. Perferendis libero excepturi officiis ab id! Fugit dolore at aliquid?</p>
+                    <p className="msg">Lorem ipsum dolor sit amet consectetur adipisicing elit?</p>
                     <div>
                         <img src={assets.profile_img} alt="" />
                         <p>1:30 PM</p>
