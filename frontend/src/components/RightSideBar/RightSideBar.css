@@ -23,7 +23,7 @@
 }
 
 .profile-image-wrapper::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -2px;
   left: -2px;
@@ -55,7 +55,9 @@
   border-radius: 50%;
   position: relative;
   z-index: 1;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .rs-profile img:hover {
@@ -85,7 +87,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -118,7 +121,14 @@
 .rs hr {
   border: none;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #ffffff50, #077eff, #ffffff50, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ffffff50,
+    #077eff,
+    #ffffff50,
+    transparent
+  );
   margin: 20px 15px;
   width: calc(100% - 30px);
 }
@@ -138,7 +148,7 @@
 }
 
 .rs-media p::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -4px;
   left: 0;
@@ -179,11 +189,15 @@
   border-radius: 12px;
 }
 
+.button-container {
+  margin-top: auto;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .rs button {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
   background: linear-gradient(135deg, #077eff, #0056b3);
   color: white;
   border: none;
@@ -198,16 +212,20 @@
   box-shadow: 0 2px 8px rgba(7, 126, 255, 0.3);
   width: auto;
   min-width: 100px;
+  position: relative;
+  bottom: auto;
+  left: auto;
+  transform: none;
 }
 
 .rs button:hover {
   background: linear-gradient(135deg, #0056b3, #077eff);
-  transform: translateX(-50%) translateY(-2px);
+  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(7, 126, 255, 0.4);
 }
 
 .rs button:active {
-  transform: translateX(-50%) translateY(0px);
+  transform: translateY(0px);
 }
 
 @keyframes fadeIn {
@@ -226,15 +244,15 @@
     max-width: 85%;
     padding-top: 40px;
   }
-  
+
   .rs-profile img {
     width: 80px;
   }
-  
+
   .rs-media div img {
     width: 50px;
   }
-  
+
   .rs button {
     padding: 8px 18px;
     font-size: 11px;
