@@ -80,11 +80,11 @@
   letter-spacing: 0.5px;
 }
 
-.rs-profile h3 img.dot {
+/* .rs-profile h3 img.dot {
   width: 12px;
   height: 12px;
   animation: pulse 2s ease infinite;
-}
+} */
 
 @keyframes pulse {
   0%,
