@@ -35,10 +35,46 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   border: 3px solid white;
   transition: transform 0.2s ease;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  will-change: transform;
 }
 
-.profile-pic:hover {
-  transform: scale(1.02);
+.profile-pic {
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+}
+
+.profile-pic.tilt-left {
+  transform: perspective(1000px) rotateY(15deg) rotateX(5deg);
+}
+
+.profile-pic.tilt-right {
+  transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+}
+
+.profile-pic.tilt-top {
+  transform: perspective(1000px) rotateX(-15deg) rotateY(0deg);
+}
+
+.profile-pic.tilt-bottom {
+  transform: perspective(1000px) rotateX(15deg) rotateY(0deg);
+}
+
+.profile-pic.tilt-top-left {
+  transform: perspective(1000px) rotateX(-12deg) rotateY(12deg);
+}
+
+.profile-pic.tilt-top-right {
+  transform: perspective(1000px) rotateX(-12deg) rotateY(-12deg);
+}
+
+.profile-pic.tilt-bottom-left {
+  transform: perspective(1000px) rotateX(12deg) rotateY(12deg);
+}
+
+.profile-pic.tilt-bottom-right {
+  transform: perspective(1000px) rotateX(12deg) rotateY(-12deg);
 }
 
 .profile form {
