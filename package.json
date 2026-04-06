@@ -10,5 +10,8 @@
   "private": true,
   "scripts": {
     "dev:client": "npm run dev -w frontend"
+  },
+  "dependencies": {
+    "dotenv-expand": "^12.0.3"
   }
 }
