@@ -8,10 +8,19 @@ const Login = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
+    const onSubmitHandler = (event) => {
+        event.preventDefault();
+        if(currState === 'Sign Up') {
+            // Will implement axios signup api service to communicate with the backend        
+        } else {
+            // Will implement axios login api service to communicate with the backend        
+        }
+    }
+
     return (
         <div className="login">
             <img src={assets.logo_big} alt="" className="logo" />
-            <form className="login-form">
+            <form onSubmit={onSubmitHandler} className="login-form">
                 <h2>{currState}</h2>
                 <p className="form-subtitle">Please {currState === "Sign Up" ? "sign up" : "log in"} to continue</p>
 
