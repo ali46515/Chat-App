@@ -2,6 +2,7 @@ import User from "../User/User.model.js";
 import Token from "../Token/token.model.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { sendEmail } from "../../utils/email.service.js";
 
 class AuthService {
   async register(userData) {
