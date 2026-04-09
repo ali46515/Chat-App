@@ -5,7 +5,7 @@ import crypto from "crypto";
 import { sendEmail } from "../../utils/email.service.js";
 
 class AuthService {
-  async register(userData) {
+  async register(userData) { 
     const { userName, email, password } = userData;
 
     if (!userName || !email || !password) {
