@@ -1,7 +1,7 @@
 {
   "name": "chat-app",
   "workspaces": [
-    "backend/*",
+    "backend",
     "frontend"
   ],
   "description": "A real-time chat application built with the MERN stack, enabling seamless messaging with dynamic user interactions.",
@@ -9,6 +9,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev:client": "npm run dev -w frontend"
+    "dev:client": "npm run dev -w frontend",
+    "dev:server": "npm run dev -w backend"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "chat-app",
+  "name": "backend",
   "version": "1.0.0",
   "description": "A real-time chat application built with the MERN stack, enabling seamless messaging with dynamic user interactions.",
   "license": "MIT",
@@ -7,7 +7,8 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "test": "node src/server.js"
+    "test": "node src/server.js",
+    "dev": "nodemon src/server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
