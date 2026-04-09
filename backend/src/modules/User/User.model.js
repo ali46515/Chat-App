@@ -153,7 +153,7 @@ const userSchema = new mongoose.Schema(
       },
       blockedUsers: [
         {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: "User",
         },
       ],
@@ -178,13 +178,13 @@ const userSchema = new mongoose.Schema(
       },
       mutedChats: [
         {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: "Chat",
         },
       ],
       mutedGroups: [
         {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: "Group",
         },
       ],
@@ -230,19 +230,19 @@ const userSchema = new mongoose.Schema(
 
     contacts: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Contact",
       },
     ],
     chats: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Chat",
       },
     ],
     groups: [
       {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Group",
       },
     ],

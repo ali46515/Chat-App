@@ -285,6 +285,4 @@ class AuthController {
   }
 }
 
-console.log(authService)
-
 export default new AuthController();
