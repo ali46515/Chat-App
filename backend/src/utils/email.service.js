@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import path from "path";
 import fs from "node:fs/promises";
-import { AppError } from "./errorHandler";
+import { AppError } from "../middleware/errorHandler.js";
 
 class EmailService {
   constructor() {
