@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+import { body, param } from "express-validator";
 
 const registerValidation = [
   body("userName")
@@ -47,7 +47,7 @@ const loginValidation = [
     return true;
   }),
 
-  body("password").trim().notEmpty().withMessage("Password is required"),  
+  body("password").trim().notEmpty().withMessage("Password is required"),
 ];
 
 const emailValidation = [
