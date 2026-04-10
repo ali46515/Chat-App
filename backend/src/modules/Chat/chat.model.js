@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const chatSchema = new mongoose.Schema(
   {
+    conversationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Conversation",
+      index: true,
+    },
     sender: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -12,14 +17,10 @@ const chatSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    message: {
-      type: String,
-    },
-    attachments: [
-      {
-        type: String,
-      },
-    ],
+
+    message: { type: String },
+    attachments: [String],
+
     status: {
       type: String,
       enum: ["sent", "delivered", "read"],
@@ -29,6 +30,6 @@ const chatSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const ChatModel = mongoose.model("Chat", chatSchema);
+chatSchema.index({ sender: 1, receiver: 1 });
 
-export default ChatModel;
+export default mongoose.model("Chat", chatSchema);
