@@ -11,5 +11,8 @@
   "scripts": {
     "dev:client": "npm run dev -w frontend",
     "dev:server": "npm run dev -w backend"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.3"
   }
 }

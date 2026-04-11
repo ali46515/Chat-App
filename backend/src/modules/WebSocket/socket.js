@@ -1,8 +1,10 @@
+import { Server } from "socket.io";
+
 let io;
 const users = new Map();
 
 const initSocket = (server) => {
-  io = require("socket.io")(server, {
+  io = new Server(server, {
     cors: {
       origin: "*",
     },
@@ -31,6 +33,7 @@ const initSocket = (server) => {
           break;
         }
       }
+      console.log("User disconnected:", socket.id);
     });
   });
 
