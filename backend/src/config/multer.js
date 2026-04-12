@@ -1,41 +1,41 @@
 import multer from "multer";
-import fs from "fs";
 import path from "path";
+import fs from "fs";
+import { AppError } from "../middleware/errorHandler.js";
 
-const uploadDir = "uploads/disputes";
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const UPLOAD_DIR = "uploads/photos";
+
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
 const storage = multer.diskStorage({
-  destination: (req, res, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, res, cb) => {
-    cb(null, res.originalname);
+  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
+  filename: (_req, file, cb) => {
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `${unique}${path.extname(file.originalname)}`);
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|mp4|mov/;
-  const extname = allowedTypes.test(
-    path.extname(file.originalname).toLowerCase(),
-  );
-  const mimetype = allowedTypes.test(file.mimetype);
+const fileFilter = (_req, file, cb) => {
+  const allowed = /jpeg|jpg|png|gif|webp/;
+  const extValid = allowed.test(path.extname(file.originalname).toLowerCase());
+  const mimeValid = allowed.test(file.mimetype);
 
-  if (mimetype && extname) {
-    return cb(null, true);
+  if (extValid && mimeValid) {
+    cb(null, true);
   } else {
-    cb(new Error("Only images, documents, and videos are allowed"));
+    cb(
+      new AppError(
+        "Only image files are allowed (jpeg, jpg, png, gif, webp)",
+        400,
+      ),
+    );
   }
 };
 
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024,
-  },
-  fileFilter: fileFilter,
+export const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
-
-export default upload;
