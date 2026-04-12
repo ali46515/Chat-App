@@ -8,12 +8,7 @@ const tokenSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    token: {
-      type: String,
-      required: true,
-      unique: true,
-      index: true,
-    },
+    token: { type: String, required: true, unique: true, index: true },
     tokenType: {
       type: String,
       enum: ["refresh", "reset", "verification"],
@@ -23,13 +18,9 @@ const tokenSchema = new mongoose.Schema(
     expiresAt: {
       type: Date,
       required: true,
-      index: { expireAfterSeconds: 0 }, // Auto-delete expired tokens
+      index: { expireAfterSeconds: 0 },
     },
-    isRevoked: {
-      type: Boolean,
-      default: false,
-      index: true,
-    },
+    isRevoked: { type: Boolean, default: false, index: true },
     revokedAt: Date,
     deviceInfo: {
       userAgent: String,
@@ -40,6 +31,4 @@ const tokenSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const TokenModel = mongoose.model("Token", tokenSchema);
-
-export default TokenModel;
+export default mongoose.model("Token", tokenSchema);
