@@ -132,11 +132,10 @@ const markDelivered = async (messageId) => {
 };
 
 export {
-  getOrCreateConversation,
+  sendMessage,
+  sendPhotoMessage,
   getMessages,
   getUserConversations,
   markAsRead,
-  sendMessage,
-  sendPhotoMessage,
   markDelivered,
 };
