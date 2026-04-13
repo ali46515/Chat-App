@@ -1,48 +1,96 @@
 import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
+import User from "../User/User.model.js";
+import { registerSocketHandlers } from "./socket.controller.js";
 
 let io;
-const users = new Map();
 
-const initSocket = (server) => {
-  io = new Server(server, {
+const onlineUsers = new Map();
+
+const authenticateSocket = async (socket, next) => {
+  try {
+    const token =
+      socket.handshake.auth?.token ||
+      socket.handshake.headers?.authorization?.replace("Bearer ", "");
+
+    if (!token) return next(new Error("AUTH_MISSING_TOKEN"));
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id).select(
+      "userName profilePicture status isActive isDeleted",
+    );
+
+    if (!user) return next(new Error("AUTH_USER_NOT_FOUND"));
+    if (!user.isActive || user.isDeleted)
+      return next(new Error("AUTH_ACCOUNT_INACTIVE"));
+
+    socket.user = user;
+    next();
+  } catch (err) {
+    next(new Error("AUTH_INVALID_TOKEN"));
+  }
+};
+
+export const initSocket = (httpServer) => {
+  io = new Server(httpServer, {
     cors: {
-      origin: "*",
+      origin: process.env.FRONTEND_URL || "http://localhost:3000",
+      credentials: true,
     },
+    pingTimeout: 60000,
+    pingInterval: 25000,
   });
 
-  io.on("connection", (socket) => {
-    console.log("User connected:", socket.id);
+  io.use(authenticateSocket);
 
-    socket.on("register", (userId) => {
-      users.set(userId, socket.id);
-    });
+  io.on("connection", async (socket) => {
+    const userId = socket.user._id.toString();
 
-    socket.on("send_message", async (data) => {
-      const { receiverId } = data;
+    if (!onlineUsers.has(userId)) onlineUsers.set(userId, new Set());
+    onlineUsers.get(userId).add(socket.id);
 
-      const receiverSocket = users.get(receiverId);
-      if (receiverSocket) {
-        io.to(receiverSocket).emit("receive_message", data);
-      }
-    });
+    if (onlineUsers.get(userId).size === 1) {
+      await User.findByIdAndUpdate(userId, { status: "online" });
 
-    socket.on("disconnect", () => {
-      for (let [userId, socketId] of users.entries()) {
-        if (socketId === socket.id) {
-          users.delete(userId);
-          break;
+      socket.broadcast.emit("user:online", { userId });
+    }
+
+    console.log(`[Socket] Connected — user=${userId}  socket=${socket.id}`);
+
+    registerSocketHandlers(io, socket, onlineUsers);
+
+    socket.on("disconnect", async (reason) => {
+      const sockets = onlineUsers.get(userId);
+      if (sockets) {
+        sockets.delete(socket.id);
+        if (sockets.size === 0) {
+          onlineUsers.delete(userId);
+          await User.findByIdAndUpdate(userId, {
+            status: "offline",
+            lastSeen: new Date(),
+          });
+          io.emit("user:offline", { userId, lastSeen: new Date() });
         }
       }
-      console.log("User disconnected:", socket.id);
+
+      console.log(`[Socket] Disconnected — user=${userId}  reason=${reason}`);
     });
   });
 
   return io;
 };
 
-const getIO = () => {
-  if (!io) throw new Error("Socket not initialized");
+export const getIO = () => {
+  if (!io) throw new Error("Socket.IO not initialized");
   return io;
 };
 
-export { initSocket, getIO };
+export const emitToUser = (userId, event, data) => {
+  const sockets = onlineUsers.get(userId.toString());
+  if (sockets) {
+    sockets.forEach((socketId) => io.to(socketId).emit(event, data));
+  }
+};
+
+export const isUserOnline = (userId) => onlineUsers.has(userId.toString());
