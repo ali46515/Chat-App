@@ -1,95 +1,161 @@
-import { Server } from "socket.io";
-import jwt from "jsonwebtoken";
-import User from "../User/User.model.js";
+import * as chatService from "../Chat/chat.service.js";
+import { emitToUser, isUserOnline } from "./socket.js";
 
-let io;
+export const registerSocketHandlers = (io, socket, onlineUsers) => {
+  const userId = socket.user._id.toString();
 
-const onlineUsers = new Map();
+  socket.on("conversation:join", async ({ conversationId }) => {
+    if (!conversationId) return;
 
-const authenticateSocket = async (socket, next) => {
-  try {
-    const token =
-      socket.handshake.auth?.token ||
-      socket.handshake.headers?.authorization?.replace("Bearer ", "");
+    socket.join(conversationId);
 
-    if (!token) return next(new Error("AUTH_MISSING_TOKEN"));
+    try {
+      const result = await chatService.getMessages(conversationId, 1, 30);
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      await chatService.markAsRead(conversationId, userId);
 
-    const user = await User.findById(decoded.id).select(
-      "userName profilePicture status isActive isDeleted",
-    );
-
-    if (!user) return next(new Error("AUTH_USER_NOT_FOUND"));
-    if (!user.isActive || user.isDeleted)
-      return next(new Error("AUTH_ACCOUNT_INACTIVE"));
-
-    socket.user = user;
-    next();
-  } catch (err) {
-    next(new Error("AUTH_INVALID_TOKEN"));
-  }
-};
-
-const initSocket = (httpServer) => {
-  io = new Server(httpServer, {
-    cors: {
-      origin: process.env.FRONTEND_URL || "http://localhost:3000",
-      credentials: true,
-    },
-    pingTimeout: 60000,
-    pingInterval: 25000,
+      socket.emit("conversation:history", {
+        conversationId,
+        ...result,
+      });
+    } catch (err) {
+      socket.emit("error", {
+        event: "conversation:join",
+        message: err.message,
+      });
+    }
   });
 
-  io.use(authenticateSocket);
+  socket.on("conversation:leave", ({ conversationId }) => {
+    socket.leave(conversationId);
+  });
 
-  io.on("connection", async (socket) => {
-    const userId = socket.user._id.toString();
-
-    if (!onlineUsers.has(userId)) onlineUsers.set(userId, new Set());
-    onlineUsers.get(userId).add(socket.id);
-
-    if (onlineUsers.get(userId).size === 1) {
-      await User.findByIdAndUpdate(userId, { status: "online" });
-
-      socket.broadcast.emit("user:online", { userId });
+  socket.on("message:send", async ({ receiverId, message }) => {
+    if (!receiverId || !message?.trim()) {
+      return socket.emit("error", {
+        event: "message:send",
+        message: "receiverId and message are required",
+      });
     }
 
-    console.log(`[Socket] Connected — user=${userId}  socket=${socket.id}`);
+    try {
+      const saved = await chatService.sendMessage({
+        senderId: userId,
+        receiverId,
+        message,
+      });
 
-    socket.on("disconnect", async (reason) => {
-      const sockets = onlineUsers.get(userId);
-      if (sockets) {
-        sockets.delete(socket.id);
-        if (sockets.size === 0) {
-          onlineUsers.delete(userId);
-          await User.findByIdAndUpdate(userId, {
-            status: "offline",
-            lastSeen: new Date(),
-          });
-          io.emit("user:offline", { userId, lastSeen: new Date() });
-        }
+      const payload = { message: saved };
+
+      emitToUser(userId, "message:new", payload);
+      emitToUser(receiverId, "message:new", payload);
+
+      if (isUserOnline(receiverId)) {
+        await chatService.markDelivered(saved._id);
+        const updatedPayload = {
+          ...payload,
+          message: { ...saved.toObject(), status: "delivered" },
+        };
+        emitToUser(userId, "message:delivered", { messageId: saved._id });
+        emitToUser(receiverId, "message:new", updatedPayload);
       }
+    } catch (err) {
+      socket.emit("error", { event: "message:send", message: err.message });
+    }
+  });
 
-      console.log(`[Socket] Disconnected — user=${userId}  reason=${reason}`);
+  socket.on("message:send_photo", async ({ receiverId, attachment }) => {
+    if (!receiverId || !attachment?.url) {
+      return socket.emit("error", {
+        event: "message:send_photo",
+        message: "receiverId and attachment.url are required",
+      });
+    }
+
+    try {
+      const convo = await chatService.getOrCreateConversation(
+        userId,
+        receiverId,
+      );
+
+      const Chat = (await import("../Chat/chat.model.js")).default;
+      const Conversation = (
+        await import("../Conversation/conversation.model.js")
+      ).default;
+
+      const saved = await Chat.create({
+        conversationId: convo._id,
+        sender: userId,
+        receiver: receiverId,
+        messageType: "photo",
+        attachment,
+        status: "sent",
+      });
+
+      await Conversation.findByIdAndUpdate(convo._id, {
+        lastMessage: saved._id,
+        lastMessageText: "📷 Photo",
+        lastMessageAt: saved.createdAt,
+        $inc: { [`unreadCounts.${receiverId}`]: 1 },
+      });
+
+      await saved.populate([
+        { path: "sender", select: "userName profilePicture" },
+        { path: "receiver", select: "userName profilePicture" },
+      ]);
+
+      const payload = { message: saved };
+      emitToUser(userId, "message:new", payload);
+      emitToUser(receiverId, "message:new", payload);
+
+      if (isUserOnline(receiverId)) {
+        await chatService.markDelivered(saved._id);
+        emitToUser(userId, "message:delivered", { messageId: saved._id });
+      }
+    } catch (err) {
+      socket.emit("error", {
+        event: "message:send_photo",
+        message: err.message,
+      });
+    }
+  });
+
+  socket.on("message:read", async ({ conversationId, senderId }) => {
+    if (!conversationId) return;
+
+    try {
+      await chatService.markAsRead(conversationId, userId);
+
+      if (senderId) {
+        emitToUser(senderId, "message:read_ack", {
+          conversationId,
+          readBy: userId,
+        });
+      }
+    } catch (err) {
+      socket.emit("error", { event: "message:read", message: err.message });
+    }
+  });
+
+  socket.on("typing:start", ({ conversationId, receiverId }) => {
+    if (!receiverId) return;
+    emitToUser(receiverId, "typing:start", {
+      conversationId,
+      userId,
+      userName: socket.user.userName,
     });
   });
 
-  return io;
+  socket.on("typing:stop", ({ conversationId, receiverId }) => {
+    if (!receiverId) return;
+    emitToUser(receiverId, "typing:stop", { conversationId, userId });
+  });
+
+  socket.on("presence:check", ({ userIds = [] }) => {
+    const result = {};
+    userIds.forEach((id) => {
+      result[id] = isUserOnline(id);
+    });
+    socket.emit("presence:status", result);
+  });
 };
-
-const getIO = () => {
-  if (!io) throw new Error("Socket.IO not initialized");
-  return io;
-};
-
-const emitToUser = (userId, event, data) => {
-  const sockets = onlineUsers.get(userId.toString());
-  if (sockets) {
-    sockets.forEach((socketId) => io.to(socketId).emit(event, data));
-  }
-};
-
-const isUserOnline = (userId) => onlineUsers.has(userId.toString());
-
-export { initSocket, getIO, emitToUser, isUserOnline };
